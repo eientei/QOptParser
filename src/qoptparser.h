@@ -44,10 +44,15 @@ public:
 
     void setOutStream(QTextStream *stream);
 
-    QStringList parse();
+    void produceHelp();
+
+    bool parse();
+
+    const QStringList & getLeftovers() const;
 
 
 private:
+    void fillSpaces(int n);
     QOption * matchOpt(const QString &str);
     QOption * matchOpt(const QChar &ch);
     void unknownOption(const QString &str);
@@ -61,6 +66,7 @@ private:
     void initialize();
 
     QStringList m_arguments;
+    QStringList m_leftovers;
     QMap<QString, QOptionList> m_options;
     QMap<QString, bool> m_unknownOptions;
     QString m_banner;

@@ -1,19 +1,26 @@
 #include "QOptParser"
 
-#include <iostream>
-
 int main(int argc, char ** argv) {
     QOptParser parser(argc,argv);
+    QTextStream stream(stdout,QIODevice::WriteOnly);
 
-    QOption help('h',"help","help","abc");
-    parser.addOption(&help);
+    QOption help('h',"help","ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff g","durrrr");
+    QOption shortOnly('s',"Option with only short trigger","lol");
+    QOption longOnly("long","Option with only long trigger","baka");
 
-    QStringList leftovers = parser.parse();
-    std::cout << "Leftovers:" << std::endl;
-    foreach (QString str, leftovers) {
-        std::cout << "'" << str.toStdString() << "'" << std::endl;
+    parser.addOption(&help,"General");
+    parser.addOption(&shortOnly,"Test");
+    parser.addOption(&longOnly,"Test");
+
+    parser.setBanner(QString("%1 [OPTIONS]\n").arg(argv[0]));
+
+    bool result = parser.parse();
+    if (result) {
+        stream << "Leftovers:" << endl;
+        foreach (QString lo, parser.getLeftovers()) {
+            stream << QString("'%1'").arg(lo) << endl;
+        }
     }
-
 
     return 0;
 }

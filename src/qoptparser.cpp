@@ -82,16 +82,132 @@ void QOptParser::setOutStream(QTextStream *stream)
     m_outstream = stream;
 }
 
-QStringList QOptParser::parse()
+void QOptParser::produceHelp()
 {
     bool wasStream = true;
     if (!m_outstream) {
         m_outstream = new QTextStream(stdout,QIODevice::WriteOnly);
         wasStream = false;
     }
-    QStringList leftovers;
+
+    int maxLongLen = 0;
+    int maxOptArgNameLen = 0;
+    int maxDescrLen = 0;
+
+    int leftMargin = 2;
+    int rightMargin = 2;
+    int termwidth = 72;
+
+    int optSpace = 0;
+
+
+    foreach (QOptionList group, m_options) {
+        foreach (QOption *opt, group) {
+            // TODO: probably inefficent
+            if (opt->getLong().length() > maxLongLen) {
+                maxLongLen = opt->getLong().length();
+            }
+            if (opt->getOArgDescr().length() > maxOptArgNameLen) {
+                maxOptArgNameLen = opt->getOArgDescr().length();
+            }
+            if (opt->getDescr().length() > maxDescrLen) {
+                maxDescrLen = opt->getDescr().length();
+            }
+        }
+    }
+
+    optSpace += leftMargin;       // obvious
+    optSpace += 2;                // short option -s
+    optSpace += 2;                // comma and space ", "
+    optSpace += maxLongLen;       // obvious
+    optSpace += 1;                // "=" or " "
+    optSpace += maxOptArgNameLen; // obvious
+    optSpace += rightMargin;      // obvious
+
+    int descrLength = termwidth - optSpace;
+
+    (*m_outstream) << m_banner;
+
+    QMap<QString, QOptionList>::const_iterator it,end;
+    end = m_options.end();
+    for (it = m_options.begin(); it != end; it++) {
+        (*m_outstream) << ">>> " << it.key() << endl;
+        foreach(QOption * opt, it.value()) {
+            fillSpaces(leftMargin);
+            if (opt->getShort().isNull()) {
+                fillSpaces(4); // "-o, "
+            } else {
+                (*m_outstream) << "-" << opt->getShort();
+                if (opt->getLong().isEmpty()) {
+                    fillSpaces(2);
+                } else {
+                    (*m_outstream) << ", ";
+                }
+            }
+            if (opt->getLong().isEmpty()) {
+                fillSpaces(maxLongLen + 2); // for "--"
+            } else {
+                (*m_outstream)  << "--" << opt->getLong();
+                fillSpaces(maxLongLen - opt->getLong().length());
+            }
+
+            if (opt->hasArg()) {
+                if (opt->getLong().isEmpty()) {
+                    fillSpaces(1); // for "="
+                    (*m_outstream) << opt->getOArgDescr();
+                } else {
+                    (*m_outstream) << "=" << opt->getOArgDescr();
+                }
+                fillSpaces(maxOptArgNameLen - opt->getOArgDescr().length() +1);
+            }
+            QStringList words = opt->getDescr().split(' ');
+            int freeSpace = descrLength;
+            bool first = true;
+            foreach (QString word, words) {
+                if ((freeSpace - word.length()) < 0) {
+                    if (word.length() > descrLength) {
+                        (*m_outstream) << word;
+                    }
+                    (*m_outstream) << endl;
+                    fillSpaces(optSpace + 1);
+                    first = true;
+                    freeSpace = descrLength;
+                } else {
+                    freeSpace -= word.length();
+                    if (first) {
+                        first = false;
+                    } else {
+                        fillSpaces(1);
+                    }
+                    (*m_outstream) << word;
+                }
+            }
+
+            (*m_outstream) << endl;
+        }
+
+    }
+
+    if (!wasStream) {
+        delete m_outstream;
+    }
+}
+
+bool QOptParser::parse()
+{
+    bool success = true;
+    bool wasStream = true;
+    if (!m_outstream) {
+        m_outstream = new QTextStream(stdout,QIODevice::WriteOnly);
+        wasStream = false;
+    }
     int arglen = m_arguments.length();
     int i;
+
+    if (arglen <= 1 && m_helpOnEmpty) {
+        produceHelp();
+    }
+
     for (i = 1; i < arglen; i++) {
         QString str = m_arguments[i];
         QString trimmed = str.trimmed();
@@ -101,25 +217,34 @@ QStringList QOptParser::parse()
                 i++;
                 break;
             }
-            QString garg = trimmed.mid(2);
+            QString garg = trimmed.mid(2,trimmed.indexOf('=')-2);
             if (QOption * opt = matchOpt(garg)) {
                 if (opt->hasArg()) {
-                    if ((i + 1) >= arglen) {
-                        missingArg(opt->getLong());
+                    if (trimmed.contains('=')) {
+                        opt->trigger(trimmed.mid(trimmed.indexOf('=')+1));
                     } else {
-                        i++;
+                        if ((i + 1) >= arglen) {
+                            missingArg(opt->getLong());
+                            success = false;
+                        } else {
+                            i++;
                         opt->trigger(m_arguments[i]);
+                        }
                     }
                 } else {
+                    if (trimmed.contains('=')) {
+                        m_leftovers.append(trimmed.mid(trimmed.indexOf('=')+1));
+                    }
                     opt->trigger();
                 }
             } else {
                 unknownOption(garg);
+                success = false;
             }
         } else if (trimmed.startsWith("-")) {
             int optlen = trimmed.length();
             if (optlen == 1) {
-                leftovers.append(str);
+                m_leftovers.append(str);
             }
             for (int n = 1; n < optlen; n++) {
                 QChar ch = trimmed.at(n);
@@ -128,6 +253,7 @@ QStringList QOptParser::parse()
                         if ((n+1) >= optlen) {
                             if ((i+1) >= arglen) {
                                 missingArg(opt->getShort());
+                                success = false;
                             } else {
                                 i++;
                                 opt->trigger(m_arguments[i]);
@@ -136,6 +262,7 @@ QStringList QOptParser::parse()
                             QString rest = trimmed.mid(n+1);
                             if (hasShortArgs(rest) && m_strictOptions) {
                                 collideOptions(opt->getShort(),rest);
+                                success = false;
                             } else {
                                 opt->trigger(rest);
                                 break; // breaks only inner cycle
@@ -146,22 +273,34 @@ QStringList QOptParser::parse()
                     }
                 } else {
                     unknownOption(ch);
+                    success = false;
                 }
             }
         } else {
-            leftovers.append(str);
+            m_leftovers.append(str);
         }
     }
 
     for (; i < arglen; i++) {
-        leftovers.append(m_arguments[i]);
+        m_leftovers.append(m_arguments[i]);
     }
 
     if (!wasStream) {
         delete m_outstream;
     }
+    return success;
+}
 
-    return leftovers;
+const QStringList &QOptParser::getLeftovers() const
+{
+    return m_leftovers;
+}
+
+void QOptParser::fillSpaces(int n)
+{
+    for (int i = 0; i < n; i++) {
+        (*m_outstream) << ' ';
+    }
 }
 
 QOption *QOptParser::matchOpt(const QString &str)

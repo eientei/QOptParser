@@ -13,7 +13,8 @@ unittest {
     TEMPLATE     = app
     QT          += testlib
     SOURCES     += ../test/main.cpp
-    INCLUDEPATH += ../src
+    INCLUDEPATH += ../src/
+    TARGET       = test01
 }
 
 DEFINES += QOPTPARSER_LIBRARY

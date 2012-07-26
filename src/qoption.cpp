@@ -1,12 +1,11 @@
 #include "qoption.h"
 
 QOption::QOption(const QChar &oshort, const QString &olong,
-                 const QString &odescr, const QString &oargdescr,
-                 QObject *parent)
-    : QObject(parent)
+                 const QString &odescr, const QString &oargdescr)
+    : QObject(0)
 {
-    m_short = oshort;
-    m_long = olong;
+    m_short  = oshort;
+    m_long   = olong;
     m_odescr = odescr;
     m_oargdescr = oargdescr;
     if (oargdescr.isNull()) {
@@ -16,18 +15,30 @@ QOption::QOption(const QChar &oshort, const QString &olong,
     }
 }
 
-QOption::QOption(const QChar &oshort, const QString &odescr,
-                 const QString &oargdescr, QObject *parent)
-    : QObject(parent)
+QOption::QOption(const QChar &oshort, const QString &odescr, const QString &oargdescr)
+    : QObject(0)
 {
-    QOption(oshort,QString(),odescr,oargdescr,parent);
+    m_short  = oshort;
+    m_odescr = odescr;
+    m_oargdescr = oargdescr;
+    if (oargdescr.isNull()) {
+        m_hasArg = false;
+    } else {
+        m_hasArg = true;
+    }
 }
 
-QOption::QOption(const QString &olong, const QString &odescr,
-                 const QString &oargdescr, QObject *parent)
-    : QObject(parent)
+QOption::QOption(const QString &olong, const QString &odescr, const QString &oargdescr)
+    : QObject(0)
 {
-    QOption(QChar(),olong,odescr,oargdescr,parent);
+    m_long   = olong;
+    m_odescr = odescr;
+    m_oargdescr = oargdescr;
+    if (oargdescr.isNull()) {
+        m_hasArg = false;
+    } else {
+        m_hasArg = true;
+    }
 }
 
 QOption::~QOption()
