@@ -15,3 +15,5 @@
 
 **/moc_*
 *.pro.user
+project/Makefile
+project/test01
