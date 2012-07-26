@@ -159,6 +159,8 @@ void QOptParser::produceHelp()
                     (*m_outstream) << "=" << opt->getOArgDescr();
                 }
                 fillSpaces(maxOptArgNameLen - opt->getOArgDescr().length() +1);
+            } else {
+                fillSpaces(maxOptArgNameLen+rightMargin); // +1 for "="
             }
             QStringList words = opt->getDescr().split(' ');
             int freeSpace = descrLength;

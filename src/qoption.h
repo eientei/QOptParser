@@ -12,13 +12,13 @@ class QOPTPARSERSHARED_EXPORT QOption : public QObject
     Q_OBJECT
 public:
     QOption(const QChar &oshort, const QString &olong,
-            const QString &odescr, const QString &oargdescr);
+            const QString &odescr, const QString &oargdescr = QString());
 
     QOption(const QChar &oshort, const QString &odescr,
-            const QString &oargdescr);
+            const QString &oargdescr = QString());
 
     QOption(const QString &olong, const QString &odescr,
-            const QString &oargdescr);
+            const QString &oargdescr = QString());
 
     ~QOption();
 
