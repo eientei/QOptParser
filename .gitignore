@@ -10,3 +10,8 @@
 *.lai
 *.la
 *.a
+
+# Qt project files
+
+**/moc_*
+*.pro.user
