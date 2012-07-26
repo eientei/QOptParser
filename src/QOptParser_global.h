@@ -1,0 +1,12 @@
+#ifndef QOPTPARSER_GLOBAL_H
+#define QOPTPARSER_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(QOPTPARSER_LIBRARY)
+#  define QOPTPARSERSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define QOPTPARSERSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // QOPTPARSER_GLOBAL_H

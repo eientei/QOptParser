@@ -1,0 +1,6 @@
+#ifndef QOPTPARSER
+#define QOPTPARSER
+
+#include "qoptparser.h"
+
+#endif // QOPTPARSER
