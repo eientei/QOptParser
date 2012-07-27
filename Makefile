@@ -1,6 +1,9 @@
 all:
 	cd project && qmake && make 
 
+all-static:
+	cd project && qmake CONFIG+=staticlib && make 	
+
 clean:
 	cd project && qmake && make clean
 
@@ -10,6 +13,3 @@ distclean:
 
 debug:
 	cd project && qmake CONFIG+=unittest CONFIG+=debug && make
-
-
-

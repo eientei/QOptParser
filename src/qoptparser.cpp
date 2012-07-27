@@ -290,6 +290,10 @@ bool QOptParser::parse()
     if (!wasStream) {
         delete m_outstream;
     }
+
+    if (!success && m_helpOnError) {
+        produceHelp();
+    }
     return success;
 }
 
