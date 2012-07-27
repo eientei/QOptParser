@@ -44,11 +44,12 @@ public:
 
     void setOutStream(QTextStream *stream);
 
-    void produceHelp();
-
     bool parse();
 
     const QStringList & getLeftovers() const;
+
+public slots:
+    void produceHelp();
 
 
 private:
