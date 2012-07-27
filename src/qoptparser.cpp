@@ -150,7 +150,6 @@ void QOptParser::produceHelp()
                 fillSpaces(maxLongLen + 2); // for "--"
             } else {
                 (*m_outstream)  << "--" << opt->getLong();
-                fillSpaces(maxLongLen - opt->getLong().length());
             }
 
             if (opt->hasArg()) {
@@ -160,6 +159,7 @@ void QOptParser::produceHelp()
                 } else {
                     (*m_outstream) << "=" << opt->getOArgDescr();
                 }
+                fillSpaces(maxLongLen - opt->getLong().length());
                 fillSpaces(maxOptArgNameLen - opt->getOArgDescr().length() +1);
             } else {
                 fillSpaces(maxOptArgNameLen+rightMargin); // +1 for "="
