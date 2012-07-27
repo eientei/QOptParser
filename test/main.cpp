@@ -8,7 +8,7 @@ int main(int argc, char ** argv) {
     QOption shortOnly('s',"Option with only short trigger");
     QOption longOnly("long","Option with only long trigger","baka");
 
-    parser.addOption(&help,"General");
+    parser.addOption(&help,"");
     parser.addOption(&shortOnly,"Test");
     parser.addOption(&longOnly,"Test");
 

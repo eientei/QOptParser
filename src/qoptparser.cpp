@@ -131,7 +131,9 @@ void QOptParser::produceHelp()
     QMap<QString, QOptionList>::const_iterator it,end;
     end = m_options.end();
     for (it = m_options.begin(); it != end; it++) {
-        (*m_outstream) << ">>> " << it.key() << endl;
+        if (!it.key().isEmpty()) {
+            (*m_outstream) << ">>> " << it.key() << endl;
+        }
         foreach(QOption * opt, it.value()) {
             fillSpaces(leftMargin);
             if (opt->getShort().isNull()) {

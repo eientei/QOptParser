@@ -1,7 +1,7 @@
 all:
 	cd project && qmake && make 
 
-all-static:
+static:
 	cd project && qmake CONFIG+=staticlib && make 	
 
 clean:

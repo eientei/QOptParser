@@ -17,3 +17,4 @@
 *.pro.user
 project/Makefile
 project/test01
+project/libQOptParser.so*
