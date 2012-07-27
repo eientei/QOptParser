@@ -225,21 +225,21 @@ bool QOptParser::parse()
             if (QOption * opt = matchOpt(garg)) {
                 if (opt->hasArg()) {
                     if (trimmed.contains('=')) {
-                        opt->trigger(trimmed.mid(trimmed.indexOf('=')+1));
+                        m_triggers.append(QPair<QOption*,QString>(opt,trimmed.mid(trimmed.indexOf('=')+1)));
                     } else {
                         if ((i + 1) >= arglen) {
                             missingArg(opt->getLong());
                             success = false;
                         } else {
                             i++;
-                        opt->trigger(m_arguments[i]);
+                            m_triggers.append(QPair<QOption*,QString>(opt,m_arguments[i]));
                         }
                     }
                 } else {
                     if (trimmed.contains('=')) {
                         m_leftovers.append(trimmed.mid(trimmed.indexOf('=')+1));
                     }
-                    opt->trigger();
+                    m_triggers.append(QPair<QOption*,QString>(opt,QString()));
                 }
             } else {
                 unknownOption(garg);
@@ -260,7 +260,7 @@ bool QOptParser::parse()
                                 success = false;
                             } else {
                                 i++;
-                                opt->trigger(m_arguments[i]);
+                                m_triggers.append(QPair<QOption*,QString>(opt,m_arguments[i]));
                             }
                         } else {
                             QString rest = trimmed.mid(n+1);
@@ -268,12 +268,12 @@ bool QOptParser::parse()
                                 collideOptions(opt->getShort(),rest);
                                 success = false;
                             } else {
-                                opt->trigger(rest);
+                                m_triggers.append(QPair<QOption*,QString>(opt,rest));
                                 break; // breaks only inner cycle
                             }
                         }
                     } else {
-                        opt->trigger();
+                        m_triggers.append(QPair<QOption*,QString>(opt,QString()));
                     }
                 } else {
                     unknownOption(ch);
@@ -287,6 +287,14 @@ bool QOptParser::parse()
 
     for (; i < arglen; i++) {
         m_leftovers.append(m_arguments[i]);
+    }
+
+    if (success) {
+        QList< QPair<QOption*, QString> >::iterator it,end;
+        end = m_triggers.end();
+        for (it = m_triggers.begin(); it != end; it++) {
+            it->first->trigger(it->second);
+        }
     }
 
     if (!wasStream) {

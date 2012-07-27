@@ -70,6 +70,7 @@ private:
     QStringList m_leftovers;
     QMap<QString, QOptionList> m_options;
     QMap<QString, bool> m_unknownOptions;
+    QList< QPair<QOption *, QString> > m_triggers;
     QString m_banner;
     QTextStream * m_outstream;
     bool m_helpOnEmpty;
