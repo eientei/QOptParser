@@ -12,9 +12,6 @@
 *.a
 
 # Qt project files
-
-**/moc_*
 *.pro.user
 project/Makefile
-project/test01
-project/libQOptParser.so*
+build/*

@@ -9,6 +9,12 @@ QT       -= gui
 TARGET = QOptParser
 TEMPLATE = lib
 
+DESTDIR     = ../build
+OBJECTS_DIR = ../build/.obj
+MOC_DIR     = ../build/.moc
+RCC_DIR     = ../build/.rcc
+UI_DIR      = ../build/.ui
+
 unittest {
     TEMPLATE     = app
     QT          += testlib
