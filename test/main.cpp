@@ -5,8 +5,8 @@ int main(int argc, char ** argv) {
     QTextStream stream(stdout,QIODevice::WriteOnly);
 
     QOption help('h',"help","ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff g","durrrr");
-    QOption shortOnly('s',"Option with only short trigger");
-    QOption longOnly("long","Option with only long trigger","baka");
+    QOption shortOnly('s',QString(),"Option with only short trigger");
+    QOption longOnly(QChar(),"long","Option with only long trigger","baka");
 
     parser.addOption(&help,"");
     parser.addOption(&shortOnly,"Test");
