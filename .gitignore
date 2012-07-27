@@ -15,3 +15,4 @@
 *.pro.user
 project/Makefile
 build/*
+!build/.keep
